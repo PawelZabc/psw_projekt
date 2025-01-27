@@ -15,8 +15,17 @@ app.prepare().then(() => {
   const io = new Server(server);
 
   io.on('connection', socket => {
-    console.log('Client connected');
+    console.log(`Client connected id:${socket.id}`);
+    socket.on("join-room",({room})=>{
+      socket.join(room)
+      console.log("room joined")
+      socket.to(room).emit("user-joined", "yay")
+      socket.on("message",(msg)=>{
+        socket.to(room).emit("message", msg)
+      })
+      
 
+    })
     socket.on('disconnect', () => {
       console.log('Client disconnected');
     });
