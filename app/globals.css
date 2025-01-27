@@ -1,21 +1,32 @@
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities; */
 
-/* :root {
-  --background: #ffffff;
-  --foreground: #171717;
+.chat-box{
+  font-size: 20px;
+  width: 300px;
+  height:800px;
+  display: flex;
+  justify-content: flex-end;
+  background-color: lightblue;
+  flex-direction: column;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.message{
+  
+  width: 300px;
+  word-wrap: break-word;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-} */
+.send-message{
+  display: flex;
+  /* justify-content: center; */
+  place-items: center;
+}
+
+.send-message > *{
+  height: 30px;
+}
+.send-message > button{
+  width: 30%;
+}
+.send-message > input{
+  width: 70%;
+}

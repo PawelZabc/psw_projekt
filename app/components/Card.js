@@ -1,7 +1,9 @@
 "use client"
 import next from "next";
+import { useState } from "react";
 
 export default function SendMessage({onSubmit}) {
+    const [card,selected] = useState(false)
     return(
         <div className="send-message">
         <input id="message_input" placeholder="message"></input>

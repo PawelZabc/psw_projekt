@@ -1,16 +1,16 @@
 "use client"
 import next from "next";
-import Message from "./components/Message";
 import { useState,useEffect } from 'react';
 import io from 'socket.io-client';
-import SendMessage from "./components/SendMessage";
+import ChatBox from "./components/ChatBox";
 import { socket } from "../socket"
 
 
 export default function Home() {
   const [messages,setMessages] = useState([
-    {sender:"server",text:"hello"},
-    {sender:"server",text:"im the server"}])
+    // {sender:"server",text:"hello"},
+    // {sender:"server",text:"im the server"}
+    ])
     
   function onSend(text) {
     const newmessage = {
@@ -48,9 +48,6 @@ export default function Home() {
     };
   }, []);
   return (
-    <>
-    {messages.map((x,i)=>(<Message key={i} message={x}/>))}
-    <SendMessage onSubmit={onSend}/>
-    </>
+    <ChatBox messages={messages} onSend={onSend}/>
   )
 }
