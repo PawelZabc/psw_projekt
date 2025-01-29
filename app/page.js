@@ -4,6 +4,8 @@ import { useState,useEffect } from 'react';
 import io from 'socket.io-client';
 import ChatBox from "./components/ChatBox";
 import { socket } from "../socket"
+import Hand from "./components/Hand";
+import PokerButtons from "./components/PokerButtons";
 
 
 export default function Home() {
@@ -11,6 +13,8 @@ export default function Home() {
     // {sender:"server",text:"hello"},
     // {sender:"server",text:"im the server"}
     ])
+  const [selected,setSelected] = useState([false,false,false,false,false])
+  const [hand,setHand] = useState([])
     
   function onSend(text) {
     const newmessage = {
@@ -19,7 +23,19 @@ export default function Home() {
     }
     socket.emit("message",text)
     setMessages((prev)=>{return [...prev,newmessage]})
-    
+  }
+
+  async function startClicked(){
+    fetch("http://localhost:8080/").then(async (resp)=>{
+      const response = await resp.json() 
+      console.log(response)
+      // setHand(response)
+    })
+    // socket.emit("start-clicked")
+  }
+
+  function click(){
+    console.log("clicked")
   }
   useEffect(() => {
     // const socket = io();
@@ -30,6 +46,11 @@ export default function Home() {
       }
       setMessages((prev)=>{return [...prev,newmessage]})
     })
+    socket.on('draw',(cards)=>{
+      console.log("drew")
+      setHand(cards)
+    })
+
 
     socket.on('connect', () => {
       console.log('Connected to WebSocket server');
@@ -48,6 +69,10 @@ export default function Home() {
     };
   }, []);
   return (
+    <div className="game">
     <ChatBox messages={messages} onSend={onSend}/>
+    <PokerButtons handleClick={click} startClicked={startClicked}/>
+    <Hand hand={hand}/>
+    </div>
   )
 }

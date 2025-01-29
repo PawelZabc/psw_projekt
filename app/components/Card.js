@@ -2,16 +2,20 @@
 import next from "next";
 import { useState } from "react";
 
-export default function SendMessage({onSubmit}) {
-    const [card,selected] = useState(false)
+// 
+
+export default function Card({card}) {
+    const [selected,setSelected] = useState(false)
+    const suit = card
+    const value = card
     return(
-        <div className="send-message">
-        <input id="message_input" placeholder="message"></input>
-        <button onClick={()=>{
-            if (document.getElementById("message_input").value)
-                {onSubmit(document.getElementById("message_input").value)}
-            document.getElementById("message_input").value = ""
-            }}>send</button>
+        <div onClick={()=>(setSelected((selected)?false:true))}
+        className={(selected)?"card selected":"card"}>
+            <div className="first"></div>
+                <div className="card-inside">
+                </div>
+            <div className="second"></div>
+
         </div>
     )
 }
