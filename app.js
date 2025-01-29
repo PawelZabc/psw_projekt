@@ -9,10 +9,13 @@ const io = require('socket.io')(server)
 app.use(express.static(path.join(__dirname,"public")))
 
 
-const cors = require("cors");
+
+
+// const cors = require("cors");
+// app.use(cors)
 // app.use("/game",express.static(path.join(__dirname,"./public/game.html")))
 
-
+app.use(express.urlencoded({ extended: true }));
 
 // const birds = require('./birds')
 
@@ -102,6 +105,11 @@ const getPoints=(hand)=>{
 
 app.get("/games",(req,res)=>{
     res.send(games)
+})
+
+
+app.post("/check",(req,res)=>{
+    console.log(req.body)
 })
 
 app.get("/draw/:amount",(req,res)=>{
