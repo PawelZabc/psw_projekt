@@ -1,5 +1,5 @@
 
-.chat-box{
+#chat-box{
   font-size: 20px;
   width: 300px;
   height:800px;
@@ -11,6 +11,11 @@
   grid-column: 1;
 }
 
+.message{
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+}
 .message{
   
   width: 300px;
@@ -45,17 +50,43 @@
   grid-template-columns:  1fr 1fr 1fr;
   grid-template-rows: 25% 25% 25% 25%;
 }
+.c23 :nth-child(1) {
+  grid-column: 2;
+  grid-row: 1;
+
+}
+
+.c467 :nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+} :nth-child(2){
+  grid-column: 3;
+  grid-row: 1;
+}
+
+/* .c5 {
+
+}
+
+.c890 {
+
+}
+
+.cJQKA {
+  nth
+} */
+
 #cards {
   flex-wrap: wrap;
   margin: 10px;
   display: flex;
 }
 
-.suit-red {
+.red {
   color: red;
 }
 
-.suit-black{
+.black{
   color:black;
 }
 
@@ -137,7 +168,7 @@ card-image.img{
   font-size: 25px;
 }
 
-.hand{
+#hand{
   justify-content: center;
   display: flex;
   grid-row: 3;

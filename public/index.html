@@ -3,13 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style></style>
+    <link rel="stylesheet" href="style.css">
     <title>Main</title>
 </head>
 <body>
-    <a href="game.html">
-        Pokeeeeeeeeeeeeer
-    </a>
+    <div class="game">
+    <div id="chat-box">
+        <div id="messages"></div>
+        <div id="send-message">
+            <input id="message-input" placeholder="message"></input>
+            <button id="send-message-button">send</button>
+        </div>
+    </div>
+    
+    <div id="menu">
+        <button id="start-button">start</button>
+        <button id="check-button">check</button>
+        <button>raise</button>
+        <button id="swap-button">swap</button>
+        <button>fold</button>
+    </div>
+
+    <div id="hand">
+    </div>
+</div>
+<input id="name" placeholder="name"></input>
     
     <script src="/socket.io/socket.io.js"></script>
     <script src="index.js"></script>
