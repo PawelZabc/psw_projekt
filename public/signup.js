@@ -1,4 +1,3 @@
-
 const username_input = document.getElementById("username-input")
 const password_input = document.getElementById("password-input")
 const draw_button = document.getElementById("draw")
@@ -15,20 +14,13 @@ form.onsubmit = async (evt)=>{
     if (!username || !password){
         message.innerHTML = "You must enter both username and password"
         return false}
-    const response = await axios.post(`${url}/api/login`,{username:username,password:password})
+    const response = await axios.post(`${url}/api/signup`,{username:username,password:password})
     .then(resp=>resp)
     .catch(err=>err.response)
     if (response.status===200){
-        message.innerHTML = "Logged in!"
+        message.innerHTML = "Account created!"
         sessionStorage.setItem("auth_key",response.data.token)}
     else{
         message.innerHTML = response.data.message}
     
-}
-
-draw_button.onclick = ()=>{
-    const token = sessionStorage.getItem("auth_key")
-    axios.get(`${url}/api/draw/5`,{headers: {
-        Authorisation: 'Bearer ' + token 
-      }})
 }
