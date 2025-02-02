@@ -4,18 +4,36 @@ const app = express()
 const port = process.env.PORT || 3000
 const server = app.listen(port,()=>console.log(`server started at port ${port}`))
 
+app.set('views', __dirname + '/views');
+app.engine('html', require('ejs').renderFile);
+
+app.set('view engine', 'ejs');
+
+const jwb = require('jsonwebtoken')
+const { use } = require('./birds')
+const { access } = require('fs')
+
+app.use(express.json())
+
 const io = require('socket.io')(server)
 
-app.use(express.static(path.join(__dirname,"public")))
+//add env to access token
+const ACCESS_TOKEN = "esrxdghju89ygt6yghuiy6trfcgvhbyhug76trfvghbhyugtrfcgvby"
+
+// app.use(express.static(path.join(__dirname,"public")))
+
+const users = [
+    {username:"Paweł",password:"password"},
+    {username:"Lolek",password:"aaaaaaa"},
+    {username:"Karol",password:"klakson"}
+]
 
 
+const cors = require("cors");
+app.use(cors)
+app.use("/login",express.static(path.join(__dirname,"./public/login.html")))
 
-
-// const cors = require("cors");
-// app.use(cors)
-// app.use("/game",express.static(path.join(__dirname,"./public/game.html")))
-
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 
 // const birds = require('./birds')
 
@@ -103,6 +121,25 @@ const getPoints=(hand)=>{
 }
 
 
+app.post("/api/login",(req,res)=>{
+    const username= req.body.username
+    const password= req.body.password
+    const id = users.find(x=>{x.username === username})
+    if (id===-1){res.send(404)}
+    else{
+    if (users[id].password === password){
+        // token = jwb.sign(users[id],ACCESS_TOKEN)
+        res.send(200)
+    }
+    else{
+        res.send(400)
+    }}
+})
+
+app.get("/login",(req,res)=>{
+    res.render('login.html')
+})
+
 app.get("/games",(req,res)=>{
     res.send(games)
 })
@@ -129,7 +166,7 @@ io.on('connection', socket => {
       socket.on("start",(who)=>{
         socket.to(room).emit("message",{msg:`${who} drew 5 cards`,who:""})
       })
-      
+
       socket.on("swap",({who,amount})=>{
         socket.to(room).emit("message", {msg:`${who} swapped ${amount} cards`,who:""})
       })
