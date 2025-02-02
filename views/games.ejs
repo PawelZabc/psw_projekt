@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Poker</title>
+</head>
+<body>
+    <a href="http://localhost:3000/">main page</a>
+    <h1>Poker games!</h1>
+    <form class="form" id="login-form">
+        <input type="text" id="name-input" placeholder="game name">
+        <!-- <input type="password" id="password-input" placeholder="password"> -->
+        <button type="submit" id="send-form">Confirm</button>
+    </form>
+    <div id="create-response">Enter a game name to create one!</div>
+    <div>Enter a game!</div>
+    <div>Remember to log in before joining <a href="http://localhost:3000/login">here</a></div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="games.js"></script>
+</body>
+</html>

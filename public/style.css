@@ -1,23 +1,20 @@
-
+body{
+  margin: 0;
+  height: 100vh;
+}
 #chat-box{
-  font-size: 20px;
   width: 300px;
-  height:800px;
+  font-size: 20px;
   display: flex;
   justify-content: flex-end;
   background-color: lightblue;
   flex-direction: column;
-  grid-row: 1/span 3;
-  grid-column: 1;
 }
 
 .message{
   display: flex;
   justify-content: flex-end;
   flex-direction: column;
-}
-.message{
-  
   width: 300px;
   word-wrap: break-word;
 }
@@ -94,8 +91,6 @@
   display: flex;
   width: 100%;
   justify-content: space-between;
-  grid-column: 2;
-  grid-row: 2;
 }
 
 .second{
@@ -155,24 +150,39 @@ card-image.img{
   height: 100%;
 }
 
-.game{
-  display: grid;
+#page{
+  height: 100%;
+  display: flex;
+
+}
+
+/* #game{
+
   grid-template-rows: 45% 10% 45%;
   grid-template-columns: 20% 80%;
   height: 100%;
 
-}
+} */
 
 #menu > button{
-  width: 200px;
+  width: 100px;
   font-size: 25px;
 }
 
 #hand{
+  height: 45%;
   justify-content: center;
   display: flex;
-  grid-row: 3;
-  grid-column: 2;
+}
+
+#opponents{
+  height: 45%;
+}
+
+#game{
+  display: flex;
+  flex-direction: column;
+  flex: 2;
 }
 
 .form{

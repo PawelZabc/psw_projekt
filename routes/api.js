@@ -1,32 +1,35 @@
 const express = require('express')
 const api = express.Router()
 const ACCESS_TOKEN = "esrxdghju89ygt6yghuiy6trfcgvhbyhug76trfvghbhyugtrfcgvby"
-
+// const uuid = require('u')
 const jwt = require('jsonwebtoken')
 
-const users = [
-    {username:"Paweł",password:"password",money:100},
-    {username:"Lolek",password:"aaaaaaa",money:100},
-    {username:"Karol",password:"klakson",money:100}
-]
+
+
+
+
 
 const check_token = (req,res,next)=>{
     // console.log(req.headers['authorisation'])
     if (!req.headers['authorisation']){
         // console.log("rendering redirect...")
         // res.render("account_redirect", {username:req.params.username})
+        res.render("login")
         res.sendStatus(401)
     }
     else{
         const header_value = req.headers['authorisation'].split(" ")
         if (header_value.length === 2){
             token = header_value[1]
-            if (!token){res.sendStatus(401)}
+            if (!token){
+                res.render("login")
+                res.sendStatus(401)}
             else{
                 req.token = token
                 next()}
         }
         else{
+            res.render("login")
             res.sendStatus(401)
         }
     }
@@ -34,7 +37,9 @@ const check_token = (req,res,next)=>{
 const authorise = (req,res,next) =>{
     const token = req.token
     jwt.verify(token,ACCESS_TOKEN,(error,data)=>{
-        if(error){res.sendStatus(403)}
+        if(error){
+            res.render("login")
+            res.sendStatus(403)}
         else{
             req.user = data
             next()}
@@ -96,12 +101,7 @@ const newUser= (username="User",password="",id="") => {
     }
 }
 
-const games = {
-    "a":{
-        players:[]
 
-    }
-}
 const getPoints=(hand)=>{
     const flush = hand.every(x=>x[0]===hand[0][0])
     const uniq = hand.reduce((akk,el)=>{
@@ -166,15 +166,47 @@ api.post("/signup",(req,res)=>{
     }
 })
 
+const users = [
+    {username:"Paweł",password:"password",money:100},
+    {username:"Lolek",password:"aaaaaaa",money:100},
+    {username:"Karol",password:"klakson",money:100}
+]
+const games = [
+    {
+        players:[],
+        deck:[...deck],
+        discard:[],
+        room:"room"
+    }
+]
 
 // api.post("/",(req,res)=>{
 //     console.log(req.body)
 // })
 
+// api.get("/joingame"){
+
+// }
+
 api.get("/draw/:amount",check_token,authorise,(req,res)=>{
     console.log(req.user)
     const result =drawCards(req.params.amount)
     res.send({cards:result})
+})
+
+api.get("/poker",(req,res)=>{
+    res.signal(200).send({games})
+})
+
+api.post("/create-poker",check_token,authorise,(req,res)=>{
+    const user = req.user
+    const name = req.body.name
+    if (games.some(x=>x.name===name)){
+        res.status(400).send({message:"A game with that name exists"})}
+    else{
+        users.push(newGame(username))
+        res.sendStatus(200)
+    }
 })
 
 // api.get("/draw/:game/:amount",check_token,authorise,(req,res)=>{

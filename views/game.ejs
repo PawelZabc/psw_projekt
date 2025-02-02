@@ -7,7 +7,7 @@
     <title>Main</title>
 </head>
 <body>
-    <div class="game">
+    <div id="page">
     <div id="chat-box">
         <div id="messages"></div>
         <div id="send-message">
@@ -15,17 +15,21 @@
             <button id="send-message-button">send</button>
         </div>
     </div>
-    
-    <div id="menu">
-        <button id="start-button">start</button>
-        <button id="check-button">check</button>
-        <button>raise</button>
-        <button id="swap-button">swap</button>
-        <button>fold</button>
-    </div>
 
-    <div id="hand">
-    </div>
+    <div id="game">
+        <div id="opponents">
+        </div>
+        <div id="menu">
+            <button id="start-button">start</button>
+            <button id="check-button">check</button>
+            <button id="raise-button">raise</button>
+            <button id="swap-button">swap</button>
+            <button id="fold-button">fold</button>
+        </div>
+
+        <div id="hand">
+        </div>
+</div>
 </div>
 <input id="name" placeholder="name"></input>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

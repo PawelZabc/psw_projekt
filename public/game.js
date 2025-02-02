@@ -12,8 +12,6 @@ const name_input = document.getElementById("name")
 
 const hand = []
 
-// console.log(start_button)
-// console.log(check_button)
 
 const url = "http://localhost:3000"
 
@@ -27,21 +25,11 @@ const suits = {
 
 const selected =[false,false,false,false,false]
 
-// const response = fetch(`${url}/check}`, {
-//     method: "POST",
-//     body: JSON.stringify({ hand: hand }),
-//   });
+const get_token = () =>{
 
-// const myHeaders = new Headers();
-// myHeaders.append("Content-Type", "application/json");
+}
 
 axios.post(`${url}/check`,data={hand:["c2","c4"]})
-
-// const response = fetch(`${url}/check`, {
-//   method: "POST",
-//   body: JSON.stringify({ hand: [1,2,3,4]}),
-//   headers: myHeaders,
-// });
 
 const cardClicked = (id)=>{
     return (env) =>{
@@ -82,7 +70,7 @@ swap_button.onclick = async () =>{
 }
 
 check_button.onclick = async () =>{
-    console.log("AAA")
+    // console.log("AAA")
     const response = await fetch(`${url}/check}`, {
         method: "POST",
         body: JSON.stringify({ hand: hand }),
@@ -109,6 +97,7 @@ const render_cards =(cards) =>{
         card.innerHTML=
         `<div class=first>${x[1]}<br>${suits[x[0]].symbol}</div>
             <div class=inner-card></div>
+
         <div class=second>${x[1]}<br>${suits[x[0]].symbol}</div>`
         player_hand.appendChild(card)
     })

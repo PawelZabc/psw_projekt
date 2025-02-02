@@ -22,4 +22,8 @@ router.get("/game",(req,res)=>{
     res.render("game")
 })
 
+router.get("/games",(req,res)=>{
+    res.render("games")
+})
+
 module.exports = router
