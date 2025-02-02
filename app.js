@@ -1,17 +1,19 @@
 const express = require('express')
-const path = require('path')
+const router = require("./routes/index.js")
+// const path = require('path')
 const app = express()
 const port = process.env.PORT || 3000
 const server = app.listen(port,()=>console.log(`server started at port ${port}`))
+const jwt = require('jsonwebtoken')
+const api = require("./routes/api.js")
 
-app.set('views', __dirname + '/views');
-app.engine('html', require('ejs').renderFile);
-
+app.set('views', "views");
+// app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'ejs');
 
 const jwb = require('jsonwebtoken')
-const { use } = require('./birds')
-const { access } = require('fs')
+
+
 
 app.use(express.json())
 
@@ -20,18 +22,34 @@ const io = require('socket.io')(server)
 //add env to access token
 const ACCESS_TOKEN = "esrxdghju89ygt6yghuiy6trfcgvhbyhug76trfvghbhyugtrfcgvby"
 
-// app.use(express.static(path.join(__dirname,"public")))
-
+app.use(express.static("public/"))
+app.use("/",router)
+app.use("/api",api)
+// app.use("/api",api)
 const users = [
     {username:"Paweł",password:"password"},
     {username:"Lolek",password:"aaaaaaa"},
     {username:"Karol",password:"klakson"}
 ]
 
+const authorise= (req,res,next) =>{
+    // console.log(req.headers)
+    // req.user = {beep:"meep"}
+    // next()
+    token = req.headers['authorisation'].split(" ")[1]
+    if(!token){res.sendStatus(401)}
+    jwt.verify(token,ACCESS_TOKEN,(error,data)=>{
+        if(error){res.sendStatus(403)}
+        else{
+            req.user = data
+            next()}
+        
+    })
+}
 
-const cors = require("cors");
-app.use(cors)
-app.use("/login",express.static(path.join(__dirname,"./public/login.html")))
+// const cors = require("cors");
+// app.use(cors)
+// app.use("/login",express.static(path.join(__dirname,"./public/login.html")))
 
 // app.use(express.urlencoded({ extended: true }));
 
@@ -62,8 +80,6 @@ function drawCards(amount){
     return result
     
 }
-
-
 const newGame = () => {
     return {
         players:[],
@@ -71,8 +87,6 @@ const newGame = () => {
         discard:[]
     }
 }
-
-
 const newPlayer = (money=0,name="Player",socket="") => {
     return {
         cards:[],
@@ -81,15 +95,12 @@ const newPlayer = (money=0,name="Player",socket="") => {
         socket:socket
     }
 }
-
-
 const games = {
     "a":{
         players:[]
 
     }
 }
-
 const getPoints=(hand)=>{
     const flush = hand.every(x=>x[0]===hand[0][0])
     const uniq = hand.reduce((akk,el)=>{
@@ -124,32 +135,39 @@ const getPoints=(hand)=>{
 app.post("/api/login",(req,res)=>{
     const username= req.body.username
     const password= req.body.password
-    const id = users.find(x=>{x.username === username})
-    if (id===-1){res.send(404)}
+    console.log(username,password)
+    const id = users.findIndex(x=>x.username === username)
+    if (id===-1){res.sendStatus(404)}
     else{
     if (users[id].password === password){
-        // token = jwb.sign(users[id],ACCESS_TOKEN)
-        res.send(200)
+        token = jwb.sign(users[id],ACCESS_TOKEN)
+
+        res.status(200).send({token})
     }
     else{
-        res.send(400)
+        res.sendStatus(400)
     }}
 })
 
-app.get("/login",(req,res)=>{
-    res.render('login.html')
-})
+// app.get("/",(req,res)=>{
+//     res.render('index')
+// })
 
-app.get("/games",(req,res)=>{
-    res.send(games)
-})
+// app.get("/login",(req,res)=>{
+//     res.render('login.html')
+// })
+
+// app.get("/games",(req,res)=>{
+//     res.send(games)
+// })
 
 
 app.post("/check",(req,res)=>{
     console.log(req.body)
 })
 
-app.get("/draw/:amount",(req,res)=>{
+app.get("/draw/:amount",authorise,(req,res)=>{
+    console.log(req.user)
     const result =drawCards(req.params.amount)
     res.send({cards:result})
 })
