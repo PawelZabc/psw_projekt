@@ -14,7 +14,7 @@ form.onsubmit = async (evt)=>{
     if (!username || !password){
         message.innerHTML = "You must enter both username and password"
         return false}
-    const response = await axios.post(`${url}/api/signup`,{username:username,password:password})
+    const response = await axios.post(`${url}/api/signup`,{name:username,password:password})
     .then(resp=>resp)
     .catch(err=>err.response)
     if (response.status===200){

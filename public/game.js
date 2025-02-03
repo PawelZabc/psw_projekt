@@ -26,10 +26,10 @@ const init_get = async()=>{
     //     Authorisation: 'Bearer ' + token 
     //   }})
     // console.log(user)
-    return user
-
+    // console.log(user)
+    socket.emit("join-room",{room:game_name,username:user.name})
 }
-
+init_get()
 // console.log(user)
 
 
@@ -62,21 +62,23 @@ const cardClicked = (id)=>{
 }
 
 send_button.onclick = async()=>{
-    //do this better
-    const user = await init_get()
     if (message_input.value){
-        socket.emit("message",{who:user.username,msg:message_input.value})
+        socket.emit("message",{msg:message_input.value})
         add_message(message_input.value,"you")
     }
     message_input.value = ""
 }
 
 start_button.onclick = async () =>{
-    const response = await fetch(`${url}/draw/${5}`)
-    const resp = await response.json()
-    socket.emit("start",name_input.value||"someone")
-    add_message("you drew 5 cards","")
-    render_cards(resp.cards)
+    // const response = await axios.post(`${url}/api/draw/${game_name}`,{amount:5,replace:[]},{headers: {
+    //     Authorisation: 'Bearer ' + token 
+    //   }})
+
+    // console.log(response)
+    socket.emit("start")
+    start_button.disabled = true
+    // add_message("you are ready to start","")
+    // render_cards(response.data.cards)
 }
 
 swap_button.onclick = async () =>{
@@ -84,7 +86,7 @@ swap_button.onclick = async () =>{
     if (amount!==0){
     const response = await fetch(`${url}/draw/${amount}`)
     const resp = await response.json()
-    socket.emit("swap",{who:name_input.value||"someone",amount:amount})
+    socket.emit("swap",{amount:amount})
     add_message(`you swapped ${amount} cards`,"")
     render_cards([...hand.filter((x,i)=>{return !selected[i]}), ...resp.cards])
 }
@@ -140,10 +142,17 @@ socket.on('message',({msg,who})=>{
 socket.on('connect', () => {
     console.log('Connected to WebSocket server');
   });
-  socket.on("user-joined",(msg)=>{
+socket.on("user-joined",(msg)=>{
     add_message(msg + " joined","")
+  })
+socket.on("start", async ()=>{
+    add_message("Everyone is ready","")
+    const response = await axios.get(`${url}/api/game/${game_name}/start`,{headers: {
+        Authorisation: 'Bearer ' + token 
+      }})
+    render_cards(response.data.cards)
   })
 
 //   console.log(game_name)
 
-  socket.emit("join-room",{room:game_name})
+  

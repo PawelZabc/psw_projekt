@@ -10,12 +10,12 @@ const url = "http://localhost:3000"
 
 form.onsubmit = async (evt)=>{
     evt.preventDefault()
-    username=username_input.value
-    password=password_input.value
+    const username=username_input.value
+    const password=password_input.value
     if (!username || !password){
         message.innerHTML = "You must enter both username and password"
         return false}
-    const response = await axios.post(`${url}/api/login`,{username:username,password:password})
+    const response = await axios.post(`${url}/api/login`,{name:username,password:password})
     .then(resp=>resp)
     .catch(err=>err.response)
     if (response.status===200){

@@ -33,29 +33,30 @@ form.onsubmit = async (evt)=>{
     
 }
 
-const gameClicked = async (evt) =>{
-    evt.preventDefault()
-    const name = evt.target.innerHTML
-    console.log(name)
-    const token = sessionStorage.getItem("auth_key")
-    const response = await axios.post(`${url}/api/join-game`,{name:name},{headers: {
-        Authorisation: 'Bearer ' + token 
-      }})
-    if (response.status===200){
-        window.location.href=evt.target.href
-    }
-}
+// const gameClicked = async (evt) =>{
+//     evt.preventDefault()
+//     const name = evt.target.innerHTML
+//     console.log(name)
+//     const token = sessionStorage.getItem("auth_key")
+//     const response = await axios.post(`${url}/api/join-game`,{name:name},{headers: {
+//         Authorisation: 'Bearer ' + token 
+//       }})
+//     if (response.status===200){
+//         window.location.href=evt.target.href
+//     }
+// }
 
 
 const get_games = async () =>{
     const response = await axios.get(`${url}/api/poker`)
     const games_list = response.data.games
+    // console.log(  Object.entries(games_list))
     games.innerHTML=""
     if (games_list){
 
-        games_list.map(x=>{
+        Object.values(games_list).map(x=>{
             const child = document.createElement("a");
-            child.onclick = gameClicked
+            // child.onclick = gameClicked
             child.innerHTML=
             `<a href="${url}/game/${x.name}">${x.name}</a>`
             games.appendChild(child)

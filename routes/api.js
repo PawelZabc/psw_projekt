@@ -65,47 +65,60 @@ const deck = [
     "h2","h3","h4","h5","h6","h7","h8","h9","h0","hJ","hQ","hK","hA",
     "s2","s3","s4","s5","s6","s7","s8","s9","s0","sJ","sQ","sK","sA"
 ]
-function drawCards(amount){
+function drawCards(amount,game){
     const a = amount-0
     const empty = Array(a).fill(null);
     const result = empty.map(x=>{
-        return deck[Math.floor(Math.random() * deck.length)]
-        // if (deck.length === 0){
-        //     console.log("no more cards")
-        //     return null}
-        // else{ 
-        //     card = Math.floor(Math.random() * deck.length);
-        //     return deck.splice(card,1)[0]}
+        // return deck[Math.floor(Math.random() * deck.length)]
+        card = Math.floor(Math.random() * games[game].deck.length);
+        return games[game].deck.splice(card,1)[0]
     })
     return result
     
 }
 const newGame = (name,owner) => {
-    return {
+    games[name]={
+        name:name,
         players:[],
         deck:[...deck],
-        discard:[],
-        name:name,
-        owner:owner
+        owner:owner,
+        chat_log:[],
+        state:""
     }
 }
-const newPlayer = (name,socket="",money=0) => {
+const newPlayer = (name,socket="",money=1000) => {
     return {
         cards:[],
         money:money,
         name:name,
-        socket:socket
+        socket:socket,
+        bet:0,
+        action:""
     }
 }
-const newUser= (username="User",password="",id="") => {
-    return {
+const newUser= (name="User",password="",id="") => {
+    users[name]={
         money:100,
-        username:username,
         password:password,
-        game:""
+        name:name
     }
 }
-
+const users = {
+    "Paweł":{name:"Paweł",password:"password",money:100},
+    "Lolek":{name:"Lolek",password:"aaaaaaa",money:10000},
+    "Karol":{name:"Karol",password:"klakson",money:100}
+}
+const games = {
+    game:
+    {
+        players:[],
+        deck:[...deck],
+        name:"game",
+        owner:"Karol",
+        chat_log:[],
+        state:"waiting"
+    }
+}
 
 const getPoints=(hand)=>{
     const flush = hand.every(x=>x[0]===hand[0][0])
@@ -139,14 +152,13 @@ const getPoints=(hand)=>{
 
 
 api.post("/login",(req,res)=>{
-    const username= req.body.username
+    const name= req.body.name
     const password= req.body.password
-    const id = users.findIndex(x=>x.username === username)
-    if (id===-1){res.status(404).send({message:"No account with that name"})}
+    const names = Object.keys(users)
+    if (!names.some(x=>x===name)){res.status(404).send({message:"No account with that name"})}
     else{
-    if (users[id].password === password){
-        token = jwt.sign(users[id],ACCESS_TOKEN)
-
+    if (users[name].password === password){
+        token = jwt.sign(users[name],ACCESS_TOKEN)
         res.status(200).send({token})
     }
     else{
@@ -165,31 +177,18 @@ api.get("/user",check_token,authorise, (req,res)=>{
 })
 
 api.post("/signup",(req,res)=>{
-    const username = req.body.username
+    const name = req.body.name
     const password = req.body.password
-    if (users.some(x=>x.username===username)){
+    if (Object.keys(users).some(x=>x===name)){
         res.status(400).send({message:"Account with that username exists"})}
     else{
-        users.push(newUser(username,password))
-        res.sendStatus(200)
+        newUser(name,password)
+        token = jwt.sign(users[name],ACCESS_TOKEN)
+        res.status(200).send({token})
     }
 })
 
-const users = [
-    {username:"Paweł",password:"password",money:100,game:""},
-    {username:"Lolek",password:"aaaaaaa",money:10000,game:"test"},
-    {username:"Karol",password:"klakson",money:100,game:""}
-]
-const games = [
-    {
-        players:[],
-        deck:[...deck],
-        discard:[],
-        name:"game",
-        owner:"Karol",
-        chat_log:[]
-    }
-]
+
 
 // api.post("/",(req,res)=>{
 //     console.log(req.body)
@@ -199,16 +198,32 @@ const games = [
 
 // }
 
-api.get("/draw/:amount",check_token,authorise,(req,res)=>{
-    console.log(req.user)
-    const result =drawCards(req.params.amount)
+api.get("/start/:game/",check_token,authorise,(req,res)=>{
+    const user = req.user
+    const game = req.params.game
+    // const amount = req.body.amount 
+    if (games[game].state === "starting"){
+        const result = drawCards(2,game)
+        games[game].players.find(user.name).cards = result
+        games[game].players.find(user.name).action = "waiting"
+        res.status(200).send({cards:result})}
+    else{
+        res.status(400).send({message:"Game is not starting"})}
+    
+})
+
+api.post("/draw/:game/",check_token,authorise,(req,res)=>{
+    const user = req.user
+    const game = req.params.game
+    const amount = req.body.amount 
+    const result =drawCards(req.body.amount,req.params.game,req.user)
     res.send({cards:result})
 })
 
 api.get("/game/:game",check_token,authorise,(req,res)=>{
     const game_name = req.params.game 
     const user = req.user
-    const game = games.find(x=>x.name===game_name)
+    const game = games[game_name]
     if(game){
         const player_id = game.players.findIndex(x=>x.name===user.name)
         if (player_id !== -1){
@@ -257,10 +272,10 @@ api.get("/poker",(req,res)=>{
 api.post("/create-poker",check_token,authorise,(req,res)=>{
     const user = req.user
     const name = req.body.name
-    if (games.some(x=>x.name===name)){
+    if (games[name]){
         res.status(400).send({message:"A game with that name exists"})}
     else{
-        games.push(newGame(name,user.name))
+        newGame(name,user.name)
         res.sendStatus(200)
     }
 })
@@ -271,4 +286,4 @@ api.post("/create-poker",check_token,authorise,(req,res)=>{
 //     res.send({cards:result})
 // })
 
-module.exports = api
+module.exports = { api , users , games , newPlayer,getPoints}
