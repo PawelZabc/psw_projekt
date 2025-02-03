@@ -9,12 +9,15 @@ const jwt = require('jsonwebtoken')
 
 
 
+
+
+
 const check_token = (req,res,next)=>{
     // console.log(req.headers['authorisation'])
     if (!req.headers['authorisation']){
         // console.log("rendering redirect...")
         // res.render("account_redirect", {username:req.params.username})
-        res.render("login")
+        // res.render("login")
         res.sendStatus(401)
     }
     else{
@@ -22,14 +25,15 @@ const check_token = (req,res,next)=>{
         if (header_value.length === 2){
             token = header_value[1]
             if (!token){
-                res.render("login")
-                res.sendStatus(401)}
+                // res.render("login")
+                res.sendStatus(401)
+            }
             else{
                 req.token = token
                 next()}
         }
         else{
-            res.render("login")
+            // res.render("login")
             res.sendStatus(401)
         }
     }
@@ -38,7 +42,7 @@ const authorise = (req,res,next) =>{
     const token = req.token
     jwt.verify(token,ACCESS_TOKEN,(error,data)=>{
         if(error){
-            res.render("login")
+            // res.render("login")
             res.sendStatus(403)}
         else{
             req.user = data
@@ -76,28 +80,29 @@ function drawCards(amount){
     return result
     
 }
-const newGame = (room="") => {
+const newGame = (name,owner) => {
     return {
         players:[],
         deck:[...deck],
         discard:[],
-        room:room
+        name:name,
+        owner:owner
     }
 }
-const newPlayer = (money=0,name="Player",socket="",id="") => {
+const newPlayer = (name,socket="",money=0) => {
     return {
         cards:[],
         money:money,
         name:name,
-        socket:socket,
-        id:id
+        socket:socket
     }
 }
 const newUser= (username="User",password="",id="") => {
     return {
         money:100,
         username:username,
-        password:password
+        password:password,
+        game:""
     }
 }
 
@@ -155,6 +160,10 @@ api.get("/account/:username",check_token,authorise,check_user,(req,res)=>{
     res.send(user)
 })
 
+api.get("/user",check_token,authorise, (req,res)=>{
+    res.status(200).send({user:req.user})
+})
+
 api.post("/signup",(req,res)=>{
     const username = req.body.username
     const password = req.body.password
@@ -167,16 +176,18 @@ api.post("/signup",(req,res)=>{
 })
 
 const users = [
-    {username:"Paweł",password:"password",money:100},
-    {username:"Lolek",password:"aaaaaaa",money:100},
-    {username:"Karol",password:"klakson",money:100}
+    {username:"Paweł",password:"password",money:100,game:""},
+    {username:"Lolek",password:"aaaaaaa",money:10000,game:"test"},
+    {username:"Karol",password:"klakson",money:100,game:""}
 ]
 const games = [
     {
         players:[],
         deck:[...deck],
         discard:[],
-        room:"room"
+        name:"game",
+        owner:"Karol",
+        chat_log:[]
     }
 ]
 
@@ -194,8 +205,53 @@ api.get("/draw/:amount",check_token,authorise,(req,res)=>{
     res.send({cards:result})
 })
 
+api.get("/game/:game",check_token,authorise,(req,res)=>{
+    const game_name = req.params.game 
+    const user = req.user
+    const game = games.find(x=>x.name===game_name)
+    if(game){
+        const player_id = game.players.findIndex(x=>x.name===user.name)
+        if (player_id !== -1){
+            const players = game.players.map(x=>{
+                return x.name
+            }
+            )
+            res.status(200).send({players:players,cards:game.players[player_id].cards})
+        }
+        else{
+            res.status(400).send({message:"Not in game"})
+        }}
+    else{res.status(404).send({message:"No game with that name"})}
+    
+})
+
+api.post("/join-game",check_token,authorise,(req,res)=>{
+    const user = req.user
+    const name = req.body.name
+    // console.log(user)
+    if (!games.some(x=>x.name===name)){
+        res.status(404).send({message:"A game with that name doesn't exist"})}
+    else{
+        const game_id = games.findIndex(x=>x.name===name)
+        //może dodać sockety
+        if (games[game_id].players.length === 4){
+            res.status(400).send({message:"Game full"})
+        }
+        else{
+            if (games[game_id].players.some(x=>x.name===user.username)){
+                res.status(400).send({message:"Already in game"})
+            }
+            else{
+                games[game_id].players.push(newPlayer(user.username))
+                res.sendStatus(200)
+            }
+        }
+            
+    }
+})
+
 api.get("/poker",(req,res)=>{
-    res.signal(200).send({games})
+    res.status(200).send({games})
 })
 
 api.post("/create-poker",check_token,authorise,(req,res)=>{
@@ -204,7 +260,7 @@ api.post("/create-poker",check_token,authorise,(req,res)=>{
     if (games.some(x=>x.name===name)){
         res.status(400).send({message:"A game with that name exists"})}
     else{
-        users.push(newGame(username))
+        games.push(newGame(name,user.name))
         res.sendStatus(200)
     }
 })

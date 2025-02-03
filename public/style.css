@@ -191,3 +191,8 @@ card-image.img{
   width: 300px;
 }
 
+#games{
+  display: flex;
+  flex-direction: column;
+}
+

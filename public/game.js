@@ -13,7 +13,29 @@ const name_input = document.getElementById("name")
 const hand = []
 
 
+const token = sessionStorage.getItem("auth_key")
+const game_name = window.location.href.split("/").at(-1)
+
 const url = "http://localhost:3000"
+
+const init_get = async()=>{
+    const user = await axios.get(`${url}/api/user`,{headers: {
+        Authorisation: 'Bearer ' + token 
+      }}).then(res=>res.data.user)
+    // const game = await axios.get(`${url}/api/game/${game_name}`,{headers: {
+    //     Authorisation: 'Bearer ' + token 
+    //   }})
+    // console.log(user)
+    return user
+
+}
+
+// console.log(user)
+
+
+
+
+
 
 const suits = {
     "s" : {"name":"Spade","symbol":"&#9824;","color":"black"},
@@ -25,11 +47,7 @@ const suits = {
 
 const selected =[false,false,false,false,false]
 
-const get_token = () =>{
-
-}
-
-axios.post(`${url}/check`,data={hand:["c2","c4"]})
+// axios.post(`${url}/check`,data={hand:["c2","c4"]})
 
 const cardClicked = (id)=>{
     return (env) =>{
@@ -43,9 +61,11 @@ const cardClicked = (id)=>{
     }
 }
 
-send_button.onclick =()=>{
+send_button.onclick = async()=>{
+    //do this better
+    const user = await init_get()
     if (message_input.value){
-        socket.emit("message",{who:name_input.value||"someone",msg:message_input.value})
+        socket.emit("message",{who:user.username,msg:message_input.value})
         add_message(message_input.value,"you")
     }
     message_input.value = ""
@@ -71,11 +91,11 @@ swap_button.onclick = async () =>{
 
 check_button.onclick = async () =>{
     // console.log("AAA")
-    const response = await fetch(`${url}/check}`, {
-        method: "POST",
-        body: JSON.stringify({ hand: hand }),
-        headers: myHeaders,
-      });
+    // const response = await fetch(`${url}/check}`, {
+    //     method: "POST",
+    //     body: JSON.stringify({ hand: hand }),
+    //     headers: myHeaders,
+    //   });
     // const resp = await response.json()
     // console.log(resp)
     // socket.emit("start",name_input.value||"someone")
@@ -92,7 +112,6 @@ const render_cards =(cards) =>{
         hand.push(x)
         const card = document.createElement("div");
         card.setAttribute("class",`card ${suits[x[0]].color}`)
-        // card.setAttribute("id",`${i}`)
         card.onclick = cardClicked(i)
         card.innerHTML=
         `<div class=first>${x[1]}<br>${suits[x[0]].symbol}</div>
@@ -114,6 +133,7 @@ const add_message = (msg,who) => {
 
 
 socket.on('message',({msg,who})=>{
+    console.log(who,msg)
     // console.log(msg,who)
     add_message(msg,who)
   })
@@ -123,4 +143,7 @@ socket.on('connect', () => {
   socket.on("user-joined",(msg)=>{
     add_message(msg + " joined","")
   })
-socket.emit("join-room","test")
+
+//   console.log(game_name)
+
+  socket.emit("join-room",{room:game_name})

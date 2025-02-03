@@ -26,10 +26,12 @@ app.use("/api",api)
 io.on('connection', socket => {
     console.log(`Client connected id:${socket.id}`);
     socket.on("join-room",({room})=>{
-      socket.join(room)
-      console.log("room joined")
+    //   socket.join(room)
+      console.log(`${room} joined`)
       socket.to(room).emit("user-joined", "someone")
       socket.on("message",({who,msg})=>{
+        console.log(who,msg)
+        console.log(room)
         socket.to(room).emit("message", {who:who,msg:msg})
       })
       socket.on("start",(who)=>{

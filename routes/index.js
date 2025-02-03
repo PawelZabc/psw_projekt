@@ -26,4 +26,14 @@ router.get("/games",(req,res)=>{
     res.render("games")
 })
 
+router.get("/game/:game",(req,res)=>{
+    const game = req.params.game
+    console.log(game)
+    res.render("game")
+})
+
+router.get("/games",(req,res)=>{
+    res.render("games")
+})
+
 module.exports = router
