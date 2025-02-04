@@ -119,8 +119,8 @@ body{
   border-radius: 20px;
   border:2px black solid;
   margin: 20px;
-  height: 350px;
-  width: 250px;
+  height: 150px;
+  width: 100px;
   background-color: white;
   display: grid;
   grid-template-columns:  30px 190px 30px;
@@ -151,6 +151,7 @@ card-image.img{
 }
 
 #page{
+  position: relative;
   height: 100%;
   display: flex;
 
@@ -170,13 +171,21 @@ card-image.img{
 }
 
 #hand{
-  height: 45%;
+  height: 25%;
   justify-content: center;
   display: flex;
 }
 
 #opponents{
-  height: 45%;
+  display: flex;
+  justify-content: space-between;
+  height: 35%;
+}
+
+#table{
+  height: 25%;
+  justify-content: center;
+  display: flex;
 }
 
 #game{
@@ -196,3 +205,21 @@ card-image.img{
   flex-direction: column;
 }
 
+.opponent{
+  background-color: blueviolet;
+  outline: 2px solid black;
+  border-radius: 200px;
+  text-align: center;
+  place-content: center;
+  width: 100px;
+  height: 100px;
+}
+
+#info-box{
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: aqua;
+}

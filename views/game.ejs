@@ -19,19 +19,32 @@
     <div id="game">
         <div id="opponents">
         </div>
+        <div id="table"></div>
         <div id="menu">
             <button id="start-button">start</button>
             <button id="check-button">check</button>
             <button id="raise-button">raise</button>
             <button id="swap-button">swap</button>
             <button id="fold-button">fold</button>
+            <div id="raise-input">
+                <button id="raise-down"><</button>
+                <div id="raise-value">0</div>
+                <button id="raise-up">></button>
+            </div>
         </div>
 
         <div id="hand">
         </div>
 </div>
+<div id="info-box">
+    <div id="name"></div>
+    <div id="bid"></div>
+    <div id="reward"></div>
+    <div id="next"></div>
+    <div id="state"></div>
+    <div id="player-num"></div>
 </div>
-<input id="name" placeholder="name"></input>
+</div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/game.js"></script>

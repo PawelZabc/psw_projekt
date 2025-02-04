@@ -3,6 +3,7 @@ const api = express.Router()
 const ACCESS_TOKEN = "esrxdghju89ygt6yghuiy6trfcgvhbyhug76trfvghbhyugtrfcgvby"
 // const uuid = require('u')
 const jwt = require('jsonwebtoken')
+const { connect } = require('.')
 
 
 
@@ -50,7 +51,7 @@ const authorise = (req,res,next) =>{
     })
 }
 const check_user = (req,res,next) =>{
-    if (req.params === req.user.username){
+    if (users[req.user]){
         next()
     }
     
@@ -79,24 +80,29 @@ function drawCards(amount,game){
 const newGame = (name,owner) => {
     games[name]={
         name:name,
+        cards:[],
         players:[],
         deck:[...deck],
         owner:owner,
         chat_log:[],
-        state:""
+        state:0,
+        end_auction:0,
+        next_player:0
     }
 }
-const newPlayer = (name,socket="",money=1000) => {
+const newPlayer = (name,socket) => {
     return {
         cards:[],
-        money:money,
         name:name,
-        socket:socket,
+        connected:true,
         bet:0,
-        action:""
+        action:"",
+        fold:false,
+        ready:false,
+        socket:socket
     }
 }
-const newUser= (name="User",password="",id="") => {
+const newUser= (name="User",password="") => {
     users[name]={
         money:100,
         password:password,
@@ -106,17 +112,21 @@ const newUser= (name="User",password="",id="") => {
 const users = {
     "Paweł":{name:"Paweł",password:"password",money:100},
     "Lolek":{name:"Lolek",password:"aaaaaaa",money:10000},
-    "Karol":{name:"Karol",password:"klakson",money:100}
+    "Karol":{name:"Karol",password:"klakson",money:100},
+    "Ka":{name:"Karol",password:"klakson",money:100}
 }
 const games = {
     game:
     {
         players:[],
         deck:[...deck],
+        cards:[],
         name:"game",
         owner:"Karol",
         chat_log:[],
-        state:"waiting"
+        state:0,
+        end_auction:0,
+        next_player:0
     }
 }
 
@@ -172,9 +182,26 @@ api.get("/account/:username",check_token,authorise,check_user,(req,res)=>{
     res.send(user)
 })
 
-api.get("/user",check_token,authorise, (req,res)=>{
+api.delete("/account/:username",check_token,authorise,(req,res)=>{
+    const user = req.user
+    console.log(users[user.name])
+    console.log(req.params.username)
+    if (users[user.name] && user.name === req.params.username){
+        delete users[user.name]
+        res.status(200).send({message:"Account deleted"})
+    }
+    else{
+        res.status(400).send({message:"not deleted account"})
+    }
+    // console.log(user)
+    
+})
+
+api.get("/user",check_token,authorise,check_user, (req,res)=>{
     res.status(200).send({user:req.user})
 })
+
+
 
 api.post("/signup",(req,res)=>{
     const name = req.body.name
@@ -226,15 +253,14 @@ api.get("/game/:game",check_token,authorise,(req,res)=>{
     const game = games[game_name]
     if(game){
         const player_id = game.players.findIndex(x=>x.name===user.name)
+        const players = game.players.map(x=>{
+            return x.name
+        })
         if (player_id !== -1){
-            const players = game.players.map(x=>{
-                return x.name
-            }
-            )
-            res.status(200).send({players:players,cards:game.players[player_id].cards})
+            res.status(200).send({players:players,cards:game.players[player_id].cards,table:game.cards})
         }
         else{
-            res.status(400).send({message:"Not in game"})
+            res.status(200).send({players})
         }}
     else{res.status(404).send({message:"No game with that name"})}
     
@@ -266,6 +292,7 @@ api.post("/join-game",check_token,authorise,(req,res)=>{
 })
 
 api.get("/poker",(req,res)=>{
+    // const result = Object.keys
     res.status(200).send({games})
 })
 
@@ -286,4 +313,4 @@ api.post("/create-poker",check_token,authorise,(req,res)=>{
 //     res.send({cards:result})
 // })
 
-module.exports = { api , users , games , newPlayer,getPoints}
+module.exports = { api , users , games , newPlayer,getPoints,drawCards,deck}
